@@ -1,4 +1,5 @@
 'use client'
+import AiSummarizer from '@/Components/AISummarizer';
 import { blog_data, assets } from '@/Assets/assets';
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image';                       
@@ -66,6 +67,7 @@ const page = ({ params }) => {
         </div>
         <div className='mx-5 max-w-[800px] md:mx-auto mt-[-100px] mb-10'>
             <Image className='border-4' src={data.image} width={1280} height={720} alt='' />
+            <AiSummarizer title={data.title} content={data.description} />
             <h1 className='my-8 text-[26px] font-semibold'>Introduction</h1>
             <div className='blog-content text-gray-700 leading-relaxed' dangerouslySetInnerHTML={{ __html: data.description || data.content || "" }} />
                 
