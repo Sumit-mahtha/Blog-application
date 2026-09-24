@@ -66,7 +66,7 @@ const Page = ({ params }) => {
             </div>
         </div>
         <div className='mx-5 max-w-[800px] md:mx-auto mt-[-100px] mb-10'>
-            <Image className='border-4' src={data.image} width={1280} height={720} alt='' />
+            <Image className='border-4' src={data.image} width={1280} height={720} alt='' unoptimized={typeof data?.image === 'string' && data.image.startsWith('data:')} />
             <AiSummarizer title={data.title} content={data.description || data.content || data.title} />
             <h1 className='my-8 text-[26px] font-semibold'>Introduction</h1>
             <div className='blog-content text-gray-700 leading-relaxed' dangerouslySetInnerHTML={{ __html: data.description || data.content || "" }} />

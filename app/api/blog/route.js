@@ -1,8 +1,6 @@
 import { ConnectDB } from "@/lib/config/db"
 import BlogModel from "@/lib/models/BlogModel"
 import { NextResponse } from "next/server"
-import { writeFile } from 'fs/promises'
-import fs from 'fs'
 
 // API endpoint to get all blogs or single blog by id
 export async function GET(request) {
@@ -27,7 +25,6 @@ export async function POST(request) {
     try {
         await ConnectDB();
         const formData = await request.formData();
-        const timestamp = Date.now();
 
         const image = formData.get('image');
         if (!image || typeof image === 'string' || typeof image.arrayBuffer !== 'function') {
@@ -36,16 +33,17 @@ export async function POST(request) {
 
         const imageByteData = await image.arrayBuffer();
         const buffer = Buffer.from(imageByteData);
-        const path = `./public/${timestamp}_${image.name}`;
-        await writeFile(path, buffer);
-        const imagUrl = `/${timestamp}_${image.name}`;
+        
+        // Convert to Base64 data URL for compatibility with Vercel/serverless environments
+        const mimeType = image.type || 'image/jpeg';
+        const base64Image = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
         const blogData = {
             title: `${formData.get('title')}`,
             description: `${formData.get('description')}`,
             category: `${formData.get('category')}`,
             author: `${formData.get('author')}`,
-            image: `${imagUrl}`,
+            image: base64Image,
             authorImg: `${formData.get('authorImg')}`,
         }
 
@@ -65,14 +63,6 @@ export async function DELETE(request) {
         const id = request.nextUrl.searchParams.get("id");
         if (!id) {
             return NextResponse.json({ success: false, msg: "ID is required" }, { status: 400 });
-        }
-        const blog = await BlogModel.findById(id);
-        if (blog && blog.image) {
-            try {
-                fs.unlinkSync(`./public${blog.image}`);
-            } catch {
-                // file might not exist locally
-            }
         }
         await BlogModel.findByIdAndDelete(id);
         return NextResponse.json({ success: true, msg: "Blog Deleted" });
