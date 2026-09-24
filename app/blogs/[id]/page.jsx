@@ -6,41 +6,41 @@ import Image from 'next/image';
 import Link from 'next/link';                        
 import axios from 'axios';
 
-const page = ({ params }) => {
+const Page = ({ params }) => {
     const { id } = React.use(params);
     const [data, setData] = useState(null);
 
-    const fetchBlogData = async () => {
-        // If id is a numeric ID (from static blog_data sample data), load from blog_data directly
-        const numericId = Number(id);
-        if (!isNaN(numericId) && numericId > 0 && numericId <= 100) {
-            const staticBlog = blog_data.find(item => item.id === numericId);
-            if (staticBlog) {
-                setData(staticBlog);
-                return;
-            }
-        }
-
-        try {
-            const response = await axios.get('/api/blog', {
-                params: { id }
-            });
-            if (response.data && response.data.blog) {
-                setData(response.data.blog);
-                return;
-            }
-        } catch (error) {
-            console.warn("Database fetch returned an error, checking static blog_data as fallback");
-        }
-
-        // Fallback for static mock blogs
-        const fallback = blog_data.find(item => String(item.id) === String(id));
-        if (fallback) {
-            setData(fallback);
-        }
-    }
-
     useEffect(() => {
+        const fetchBlogData = async () => {
+            // If id is a numeric ID (from static blog_data sample data), load from blog_data directly
+            const numericId = Number(id);
+            if (!isNaN(numericId) && numericId > 0 && numericId <= 100) {
+                const staticBlog = blog_data.find(item => item.id === numericId);
+                if (staticBlog) {
+                    setData(staticBlog);
+                    return;
+                }
+            }
+
+            try {
+                const response = await axios.get('/api/blog', {
+                    params: { id }
+                });
+                if (response.data && response.data.blog) {
+                    setData(response.data.blog);
+                    return;
+                }
+            } catch {
+                console.warn("Database fetch returned an error, checking static blog_data as fallback");
+            }
+
+            // Fallback for static mock blogs
+            const fallback = blog_data.find(item => String(item.id) === String(id));
+            if (fallback) {
+                setData(fallback);
+            }
+        };
+
         if (id) {
             fetchBlogData();
         }
@@ -67,7 +67,7 @@ const page = ({ params }) => {
         </div>
         <div className='mx-5 max-w-[800px] md:mx-auto mt-[-100px] mb-10'>
             <Image className='border-4' src={data.image} width={1280} height={720} alt='' />
-            <AiSummarizer title={data.title} content={data.description} />
+            <AiSummarizer title={data.title} content={data.description || data.content || data.title} />
             <h1 className='my-8 text-[26px] font-semibold'>Introduction</h1>
             <div className='blog-content text-gray-700 leading-relaxed' dangerouslySetInnerHTML={{ __html: data.description || data.content || "" }} />
                 
@@ -84,4 +84,4 @@ const page = ({ params }) => {
     )
 }
 
-export default page
+export default Page

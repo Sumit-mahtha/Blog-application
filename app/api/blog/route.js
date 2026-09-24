@@ -70,7 +70,7 @@ export async function DELETE(request) {
         if (blog && blog.image) {
             try {
                 fs.unlinkSync(`./public${blog.image}`);
-            } catch (e) {
+            } catch {
                 // file might not exist locally
             }
         }
